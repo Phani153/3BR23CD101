@@ -1,0 +1,182 @@
+import random
+import time
+
+# Class representing the specifications of a container
+class ContainerSpec:
+    def __init__(self, container_id, name, image, ports, env_vars):
+        self.container_id = container_id  # Unique ID for the container
+        self.name = name  # Name of the container
+        self.image = image  # Docker image to use
+        self.ports = ports  # Port mappings
+        self.env_vars = env_vars  # Environment variables
+        self.status = 'created'  # Initial status of the container (e.g., 'created')
+
+    def __str__(self):
+        return f"Container ID: {self.container_id}, Name: {self.name}, Image: {self.image}, Ports: {self.ports}, Env Vars: {self.env_vars}, Status: {self.status}"
+
+
+# Class to manage the containers and their statuses
+class ContainerManager:
+    def __init__(self):
+        self.containers = {}  # Dictionary to store container_id -> ContainerSpec
+
+    # Create a new container specification and add it to the list
+    def create_container(self, name, image, ports, env_vars):
+        container_id = random.randint(1000, 9999)  # Generate a random container ID
+        new_container = ContainerSpec(container_id, name, image, ports, env_vars)
+        self.containers[container_id] = new_container
+        print(f"Container {name} created with ID {container_id}")
+        return container_id
+
+    # Read details of an existing container
+    def get_container(self, container_id):
+        if container_id in self.containers:
+            return self.containers[container_id]
+        else:
+            return "Container not found"
+
+    # Update details of an existing container
+    def update_container(self, container_id, name=None, image=None, ports=None, env_vars=None):
+        if container_id in self.containers:
+            container = self.containers[container_id]
+            if name:
+                container.name = name
+            if image:
+                container.image = image
+            if ports:
+                container.ports = ports
+            if env_vars:
+                container.env_vars = env_vars
+            print(f"Container {container_id} updated successfully.")
+        else:
+            print("Container not found")
+
+    # Delete a container specification
+    def delete_container(self, container_id):
+        if container_id in self.containers:
+            del self.containers[container_id]
+            print(f"Container {container_id} deleted successfully.")
+        else:
+            print("Container not found")
+
+    # Simulate deploying a container (starting it)
+    def deploy_container(self, container_id):
+        if container_id in self.containers:
+            container = self.containers[container_id]
+            container.status = 'running'
+            print(f"Container {container_id} is now running.")
+        else:
+            print("Container not found")
+
+    # Simulate stopping a container
+    def stop_container(self, container_id):
+        if container_id in self.containers:
+            container = self.containers[container_id]
+            container.status = 'stopped'
+            print(f"Container {container_id} has been stopped.")
+        else:
+            print("Container not found")
+
+    # Track the status of a container
+    def track_status(self, container_id):
+        if container_id in self.containers:
+            container = self.containers[container_id]
+            print(f"Container {container_id} status: {container.status}")
+            return container.status
+        else:
+            return "Container not found"
+
+
+# Example usage
+if __name__ == "__main__":
+    manager = ContainerManager()
+
+    # Create a container
+    container_id = manager.create_container(name="web_app", image="nginx:latest", ports={80: 8080}, env_vars={"ENV": "prod"})
+
+    # Get container details
+    print(manager.get_container(container_id))
+
+    # Update the container
+    manager.update_container(container_id, name="updated_web_app")
+
+    # Deploy the container
+    manager.deploy_container(container_id)
+
+    # Track the container's status
+    manager.track_status(container_id)
+
+    # Stop the container
+    manager.stop_container(container_id)
+
+    # Track the status again
+    manager.track_status(container_id)
+
+    # Delete the container
+    manager.delete_container(container_id)
+def display_menu():
+    print("\nContainer Management System")
+    print("1. Create Container")
+    print("2. Get Container Details")
+    print("3. Update Container")
+    print("4. Deploy Container")
+    print("5. Stop Container")
+    print("6. Track Container Status")
+    print("7. Delete Container")
+    print("8. Exit")
+
+def main():
+    manager = ContainerManager()
+    
+    while True:
+        display_menu()
+        choice = input("Enter your choice (1-8): ")
+
+        if choice == '1':
+            name = input("Enter container name: ")
+            image = input("Enter Docker image: ")
+            ports = input("Enter port mappings (e.g., {80: 8080}): ")
+            env_vars = input("Enter environment variables (e.g., {'ENV': 'prod'}): ")
+            container_id = manager.create_container(name, image, eval(ports), eval(env_vars))
+
+        elif choice == '2':
+            container_id = input("Enter container ID: ")
+            print(manager.get_container(container_id))
+
+        elif choice == '3':
+            container_id = input("Enter container ID: ")
+            name = input("Enter new name (leave blank to keep current): ")
+            image = input("Enter new image (leave blank to keep current): ")
+            ports = input("Enter new ports (leave blank to keep current): ")
+            env_vars = input("Enter new environment variables (leave blank to keep current): ")
+            manager.update_container(container_id, 
+                                     name if name else None,
+                                     image if image else None,
+                                     eval(ports) if ports else None,
+                                     eval(env_vars) if env_vars else None)
+
+        elif choice == '4':
+            container_id = input("Enter container ID: ")
+            manager.deploy_container(container_id)
+
+        elif choice == '5':
+            container_id = input("Enter container ID: ")
+            manager.stop_container(container_id)
+
+        elif choice == '6':
+            container_id = input("Enter container ID: ")
+            manager.track_status(container_id)
+
+        elif choice == '7':
+            container_id = input("Enter container ID: ")
+            manager.delete_container(container_id)
+
+        elif choice == '8':
+            print("Exiting the Container Management System.")
+            break
+
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
